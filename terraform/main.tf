@@ -156,7 +156,7 @@ resource "aws_cloudfront_distribution" "website" {
   }
 
   tags = {
-    Name = var.domain_name
+    Name = "New Tag"
   }
 }
 
