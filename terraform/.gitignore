@@ -38,3 +38,6 @@ terraform.rc
 
 # Ignore environment variables bash script to protect secrets
 env.sh
+
+# Ignore remote state config
+state.config

@@ -15,6 +15,8 @@ terraform {
       version = ">= 3.7.2"
     }
   }
+  backend "s3" {
+  }
 }
 
 provider "aws" {
