@@ -12,15 +12,13 @@ jobs:
   terraform:
     name: 'terraform'
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./terraform
     environment: production
 
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
       run:
         shell: bash
+        working-directory: ./terraform
 
     steps:
     # Checkout the repository to the GitHub Actions runner
