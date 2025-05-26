@@ -48,6 +48,15 @@ resource "aws_s3_bucket" "website" {
   }
 }
 
+resource "aws_s3_bucket_public_access_block" "website" {
+  bucket = aws_s3_bucket.website.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
 resource "aws_s3_bucket_ownership_controls" "website" {
   bucket = aws_s3_bucket.website.id
 
@@ -109,7 +118,7 @@ resource "aws_cloudfront_distribution" "website" {
   aliases = [var.domain_name]
 
   default_cache_behavior {
-    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    allowed_methods  = ["GET", "HEAD"]
     cached_methods   = ["GET", "HEAD"]
     target_origin_id = var.domain_name
 
@@ -133,9 +142,15 @@ resource "aws_cloudfront_distribution" "website" {
 
   price_class = "PriceClass_100"
 
+  custom_error_response {
+    error_code         = 404
+    response_code      = 404
+    response_page_path = "/404.html"
+  }
+
   viewer_certificate {
     acm_certificate_arn = aws_acm_certificate.website.arn
-    ssl_support_method = "sni-only"
+    ssl_support_method  = "sni-only"
   }
 
   tags = {
@@ -143,13 +158,34 @@ resource "aws_cloudfront_distribution" "website" {
   }
 }
 
+data "aws_iam_policy_document" "cloudfront_access_s3" {
+  statement {
+    actions   = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.website.arn}/*"]
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceArn"
+      values   = [aws_cloudfront_distribution.website.arn]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "website" {
+  bucket = aws_s3_bucket.website.id
+  policy = data.aws_iam_policy_document.cloudfront_access_s3.json
+}
+
 resource "cloudflare_dns_record" "cloudfront" {
   zone_id = data.cloudflare_zone.website.zone_id
   comment = "AWS Cloudfront record"
-  name    = "@"
+  name    = var.domain_name
   type    = "CNAME"
-  proxied = true
-  ttl     = 1
+  proxied = false
+  ttl     = 60
   content = aws_cloudfront_distribution.website.domain_name
 }
 
