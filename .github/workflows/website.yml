@@ -37,10 +37,10 @@ jobs:
         STATE_BUCKET: ${{ secrets.STATE_BUCKET }}
         STATE_KEY: ${{ secrets.STATE_KEY }}
         TF_VAR_AWS_REGION: ${{ secrets.TF_VAR_AWS_REGION }}
-      run: |
-        terraform init \
-          -backend-config="bucket=$STATE_BUCKET" \
-          -backend-config="key=$STATE_KEY" \
+      run: >
+        terraform init
+          -backend-config="bucket=$STATE_BUCKET"
+          -backend-config="key=$STATE_KEY"
           -backend-config="region=$TF_VAR_AWS_REGION"
 
     # Checks that all Terraform configuration files adhere to a canonical format
@@ -74,7 +74,7 @@ jobs:
         TF_VAR_aws_region: ${{ secrets.TF_VAR_AWS_REGION }}
         TF_VAR_cloudflare_api_token: ${{ secrets.TF_VAR_CLOUDFLARE_API_TOKEN }}
         TF_VAR_domain_name: ${{ secrets.TF_VAR_DOMAIN_NAME }}
-      run: echo "S3_BUCKET_URL=$(terraform output s3_bucket_url | tr -d '"\n')" >> $GITHUB_ENV
+      run: echo "S3_BUCKET_URL=$(terraform output s3_bucket_url | tr -d '"' | td -d '\n')" >> $GITHUB_ENV
 
     - name: Print env var
       run: echo $S3_BUCKET_URL
@@ -94,11 +94,11 @@ jobs:
     steps:
       - name: Hugo setup
         run: |
-          curl -L "https://github.com/gohugoio/hugo/releases/download/v0.147.7/hugo_extended_withdeploy_0.147.7_linux-amd64.tar.gz" -o "hugo.tar.gz" \
-            && mkdir hugo \
-            && tar -xvzf hugo.tar.gz -C hugo \
-            && cp hugo/hugo /bin \
-            && rm -r hugo
+          curl -L "https://github.com/gohugoio/hugo/releases/download/v0.147.7/hugo_extended_withdeploy_0.147.7_linux-amd64.tar.gz" -o "hugo.tar.gz"
+          mkdir hugo
+          tar -xvzf hugo.tar.gz -C hugo
+          cp hugo/hugo /bin
+          rm -r hugo
 
       - name: Set S3 bucket target
         run: sed -i -e 's@S3_BUCKET_URL@'"$S3_BUCKET_URL"'@g' hugo.toml
