@@ -80,30 +80,31 @@ jobs:
       run: echo $S3_BUCKET_URL
 
   hugo:
+
     needs: terraform
     name: 'hugo'
-      runs-on: ubuntu-latest
-      environment: production
+    runs-on: ubuntu-latest
+    environment: production
 
-      defaults:
-        run:
-          shell: bash
-          working-directory: ./hugo
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./hugo
 
-      steps:
-        - name: Hugo setup
-          run: |
-            curl -L "https://github.com/gohugoio/hugo/releases/download/v0.147.7/hugo_extended_withdeploy_0.147.7_linux-amd64.tar.gz" -o "hugo.tar.gz" \
-              && mkdir hugo \
-              && tar -xvzf hugo.tar.gz -C hugo \
-              && cp hugo/hugo /bin \
-              && rm -r hugo
+    steps:
+      - name: Hugo setup
+        run: |
+          curl -L "https://github.com/gohugoio/hugo/releases/download/v0.147.7/hugo_extended_withdeploy_0.147.7_linux-amd64.tar.gz" -o "hugo.tar.gz" \
+            && mkdir hugo \
+            && tar -xvzf hugo.tar.gz -C hugo \
+            && cp hugo/hugo /bin \
+            && rm -r hugo
 
-        - name: Set S3 bucket target
-          run: sed -i -e 's@S3_BUCKET_URL@'"$S3_BUCKET_URL"'@g' hugo.toml
+      - name: Set S3 bucket target
+        run: sed -i -e 's@S3_BUCKET_URL@'"$S3_BUCKET_URL"'@g' hugo.toml
 
-        - name: Deploy Hugo site to S3 bucket
-          env:
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          run: hugo deploy
+      - name: Deploy Hugo site to S3 bucket
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: hugo deploy
