@@ -2,3 +2,8 @@ baseURL = 'https://example.org/'
 languageCode = 'en-us'
 title = 'Seth Franklin'
 theme = 'ananke'
+
+[deployment]
+  [[deployment.targets]]
+    name = 'production'
+    url = 'S3_BUCKET_URL'
