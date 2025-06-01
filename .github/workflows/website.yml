@@ -71,10 +71,10 @@ jobs:
         working-directory: ./hugo
         run: sed -i -e 's@S3_BUCKET_URL@'"$S3_BUCKET_URL"'@g' hugo.toml
 
-      - name: Make a public directory
+      - name: Hugo build
         working-directory: ./hugo
-        run: mkdir public
+        run: hugo build
 
-      - name: Deploy Hugo site to S3 bucket
+      - name: Hugo deploy
         working-directory: ./hugo
         run: hugo deploy
