@@ -78,6 +78,7 @@ jobs:
 
     - name: Print env var
       run: echo $S3_BUCKET_URL
+
   hugo:
     needs: terraform
     name: 'hugo'
