@@ -58,7 +58,7 @@ jobs:
 
       - name: Output S3 bucket URL
         working-directory: ./terraform
-        run: echo "S3_BUCKET_URL=$(terraform output s3_bucket_url | tr -d '"')" >> $GITHUB_OUTPUT
+        run: echo "S3_BUCKET_URL=$(terraform output s3_bucket_url | tr -d '"')" >> $GITHUB_ENV
 
       - name: Install hugo
         run: |
