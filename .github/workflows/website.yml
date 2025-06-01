@@ -18,6 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
 
+    outputs:
+      S3_BUCKET_URL: ${{ steps.output_s3_bucket_url.outputs.S3_BUCKET_URL }}
+
     env:
       TF_VAR_aws_region: ${{ secrets.TF_VAR_AWS_REGION }}
       TF_VAR_cloudflare_api_token: ${{ secrets.TF_VAR_CLOUDFLARE_API_TOKEN }}
@@ -56,6 +59,7 @@ jobs:
         run: terraform apply -auto-approve -input=false
 
       - name: Output S3 bucket URL
+        id: output_s3_bucket_url
         run: echo "S3_BUCKET_URL=$(terraform output s3_bucket_url | tr -d '"')" >> $GITHUB_OUTPUT
 
   hugo:
