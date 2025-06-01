@@ -71,9 +71,9 @@ jobs:
         working-directory: ./hugo
         run: sed -i -e 's@S3_BUCKET_URL@'"$S3_BUCKET_URL"'@g' hugo.toml
 
-      - name: Hugo build
+      - name: Build Hugo site
         working-directory: ./hugo
-        run: hugo build
+        run: hugo
 
       - name: Hugo deploy
         working-directory: ./hugo
