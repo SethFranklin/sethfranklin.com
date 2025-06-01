@@ -73,6 +73,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Show path var
+        run: echo $PATH
+
       - name: Install hugo
         run: |
           curl -L "https://github.com/gohugoio/hugo/releases/download/v0.147.7/hugo_extended_withdeploy_0.147.7_linux-amd64.tar.gz" -o "hugo.tar.gz"
