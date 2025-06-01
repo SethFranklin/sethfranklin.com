@@ -56,13 +56,16 @@ jobs:
         run: terraform apply -auto-approve -input=false
 
       - name: Output S3 bucket URL
-        run: echo "S3_BUCKET_URL=$(terraform output s3_bucket_url | tr -d '"')" >> $GITHUB_ENV
+        run: echo "S3_BUCKET_URL=$(terraform output s3_bucket_url | tr -d '"')" >> $GITHUB_OUTPUT
 
   hugo:
     needs: terraform
     name: 'hugo'
     runs-on: ubuntu-latest
     environment: production
+
+    env:
+      S3_BUCKET_URL: ${{ needs.terraform.outputs.S3_BUCKET_URL }}
 
     defaults:
       run:
@@ -72,9 +75,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Show path var
-        run: echo $PATH
 
       - name: Install hugo
         run: |
