@@ -74,7 +74,7 @@ jobs:
         TF_VAR_aws_region: ${{ secrets.TF_VAR_AWS_REGION }}
         TF_VAR_cloudflare_api_token: ${{ secrets.TF_VAR_CLOUDFLARE_API_TOKEN }}
         TF_VAR_domain_name: ${{ secrets.TF_VAR_DOMAIN_NAME }}
-      run: echo "S3_BUCKET_URL=$(terraform output s3_bucket_url | tr -d '"')" >> "$GITHUB_ENV"
+      run: echo "S3_BUCKET_URL=$(terraform output s3_bucket_url | tr -d '"\n')" >> $GITHUB_ENV
 
     - name: Print env var
       run: echo $S3_BUCKET_URL
