@@ -50,28 +50,30 @@ resource "aws_s3_bucket" "website" {
   }
 }
 
+resource "aws_s3_bucket_website_configuration" "website" {
+  bucket = aws_s3_bucket.website.bucket
+
+  index_document {
+    suffix = "index.html"
+  }
+
+  error_document {
+    key = "404.html"
+  }
+}
+
 resource "aws_s3_bucket_public_access_block" "website" {
   bucket = aws_s3_bucket.website.id
 
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-resource "aws_s3_bucket_ownership_controls" "website" {
-  bucket = aws_s3_bucket.website.id
-
-  rule {
-    object_ownership = "ObjectWriter"
-  }
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
 }
 
 resource "aws_s3_bucket_acl" "website" {
   bucket = aws_s3_bucket.website.id
   acl    = "private"
-
-  depends_on = [aws_s3_bucket_ownership_controls.website]
 }
 
 resource "aws_acm_certificate" "website" {
@@ -97,19 +99,16 @@ resource "cloudflare_dns_record" "validation" {
   content = trim(one(aws_acm_certificate.website.domain_validation_options).resource_record_value, ".")
 }
 
-resource "aws_cloudfront_origin_access_control" "website" {
-  name                              = var.domain_name
-  description                       = var.domain_name
-  origin_access_control_origin_type = "s3"
-  signing_behavior                  = "always"
-  signing_protocol                  = "sigv4"
-}
-
 resource "aws_cloudfront_distribution" "website" {
   origin {
-    domain_name              = aws_s3_bucket.website.bucket_regional_domain_name
-    origin_access_control_id = aws_cloudfront_origin_access_control.website.id
-    origin_id                = var.domain_name
+    domain_name = aws_s3_bucket_website_configuration.website.website_endpoint
+    origin_id   = var.domain_name
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "http-only"
+      origin_ssl_protocols   = ["SSLv3", "TLSv1", "TLSv1.1", "TLSv1.2"]
+    }
   }
 
   enabled             = true
@@ -165,13 +164,8 @@ data "aws_iam_policy_document" "cloudfront_access_s3" {
     actions   = ["s3:GetObject"]
     resources = ["${aws_s3_bucket.website.arn}/*"]
     principals {
-      type        = "Service"
-      identifiers = ["cloudfront.amazonaws.com"]
-    }
-    condition {
-      test     = "StringEquals"
-      variable = "AWS:SourceArn"
-      values   = [aws_cloudfront_distribution.website.arn]
+      type        = "*"
+      identifiers = ["*"]
     }
   }
 }
