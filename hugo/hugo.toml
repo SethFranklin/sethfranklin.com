@@ -3,6 +3,24 @@ languageCode = 'en-us'
 title = 'Seth Franklin'
 theme = 'ananke'
 
+sectionPagesMenu = "main"
+
+[params]
+mainSections = ["posts", "about"]
+recent_posts_number = 3
+
+[params.ananke.social.follow]
+networks = [
+  "youtube",
+  "linkedin"
+]
+
+[params.ananke.social.youtube]
+username = "SethFranklin0"
+
+[params.ananke.social.linkedin]
+username = "sethjfranklin"
+
 [deployment]
   [[deployment.targets]]
     name = 'production'
