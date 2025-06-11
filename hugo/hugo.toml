@@ -12,11 +12,15 @@ recent_posts_number = 3
 [params.ananke.social.follow]
 networks = [
   "youtube",
+  "github",
   "linkedin"
 ]
 
 [params.ananke.social.youtube]
 username = "SethFranklin0"
+
+[params.ananke.social.github]
+username = "SethFranklin"
 
 [params.ananke.social.linkedin]
 username = "sethjfranklin"
